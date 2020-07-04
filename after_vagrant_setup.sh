@@ -77,7 +77,7 @@ ssh -F $ssh_directory/config $ssh_config_host "echo export PUPPETEER_USERNAME=$P
 # アプリケーションのパスワード名
 read -sp "input ${APP} password>" ${APP}_PASSWORD
 ssh -F $ssh_directory/config $ssh_config_host "echo export PUPPETEER_PASSWORD=$PUPPETEER_PASSWORD >> /home/$loginuser/.profile"
-echo ""
+echo -e "\ns"
 
 
 # ansibleで解決できないか確認。
@@ -85,7 +85,7 @@ echo ""
 # これがないとALLOWED_HOSTなどを開発時と環境時でがちゃがちゃ触る必要があるので、
 # 非効率。
 server_hostname=$(ssh -F .ssh/config vagrant hostname)
-echo "added recored to /etc/hosts"
+echo "added vagrant hostname and ip address to /etc/hosts"
 sudo su <<END
     echo "# below record is develop server record." >> /etc/hosts
     echo "$server_ip $server_hostname $server_hostname" >> /etc/hosts
