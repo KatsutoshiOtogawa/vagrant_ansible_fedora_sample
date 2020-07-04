@@ -1,0 +1,4 @@
+.vagrant
+.ssh
+.roles
+ansible_password.yml

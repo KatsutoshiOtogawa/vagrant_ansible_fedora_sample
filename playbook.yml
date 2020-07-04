@@ -1,0 +1,13 @@
+---
+  - hosts: test_server
+    tasks:
+    - name: 
+      synchronize:
+        mode: pull
+        src: /home/public/vagrant/
+        dest: ../data/
+        recursive: yes
+        delete: yes
+        use_ssh_args: yes
+    vars_files:
+      - ansible_password.yml
