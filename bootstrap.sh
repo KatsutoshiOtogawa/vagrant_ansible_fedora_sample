@@ -1,4 +1,5 @@
 dnf -y update
+dnf -y install git
 
 # ansible 利用のための設定
 ## デフォルトのログインユーザー,vagrantの場合はvagrant,awsなどはec2-userなど
@@ -59,6 +60,54 @@ usermod -aG $loginuser ansible
 # ログインユーザーの環境変数に他のユーザーとの共有用のディレクトリを書いておく。
 su $loginuser -c "echo export APP_DATA=/home/public/$loginuser >> /home/$loginuser/.profile"
 
+## install wireguard
+## 未実装
+# dnf install wireguard-tools
+# # サーバー側の秘密鍵を作成
+# wg genkey >> /etc/wireguard/server.key
+# chmod 600 /etc/wireguard/server.key
+
+# # ユーザー配布用のサーバーの公開鍵を作成
+# cat /etc/wireguard/server.key | wg pubkey >> /etc/wireguard/server.pub
+# chmod 600 /etc/wireguard/server.pub
+
+# # ログインユーザーにサーバーの公開鍵を配布
+# cp /etc/wireguard/server.pub /home/$loginuser/
+# chown $loginuser:$loginuser /home/$loginuser/server.pub
+
+# # 
+# serverkey=$(cat /etc/wireguard/server.key)
+# echo "
+# [Interface]
+# PrivateKey = $serverkey
+# Address = 10.0.0.1
+# ListenPort = 51820
+
+# [Peer]
+# PublicKey = I1HvSRbkkpHErYI6XWfu9d0EoRkKiqi52DbcZuGhAEU=
+# AllowedIPs = 10.0.0.2/32
+# " >> /etc/wireguard/wg0.conf
+
+# # firewalldのインストール,設定
+# # 参考 (https://qiita.com/suzutsuki0220/items/4a62cc0e676a80ed79f1)
+# dnf -y install firewalld
+# systemctl enable firewalld && systemctl start firewalld
+# # firewalldで設定wireguardは20200702現在。firewall-cmd --get-servicesに
+# # 登録されていないので、定義も作成する。
+# echo "
+# <?xml version='1.0' encoding='utf-8'?>
+# <service>
+#   <short>wireguard</short>
+#   <description>wireguard is a virtual private network (VPN) solution. It is used to create encrypted point-to-point tunnels between computers. If you plan to provide a VPN service, enable this option.</description>
+#   <port protocol='udp' port='51280'></port>
+# </service>
+# " >> /etc/firewalld/services/wireguard.xml
+# # firewallの設定を反映させる。
+# firewall-cmd --reload
+# firewall-cmd -add-service=wireguard --permanent
+
+
+## [Optional]
 ## you want to install desktop uncomment this code
 ## puppeteerはデスクトップ環境が必要なためインストール。
 ## ログイン自体はcuiでもいいのでmulti-userにしておく。
